@@ -2,7 +2,10 @@
 package com.poppop.RNReactNativeSharedGroupPreferences;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import java.io.*;
 import android.Manifest;
@@ -10,18 +13,21 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -30,9 +36,12 @@ public class RNReactNativeSharedGroupPreferencesModule extends ReactContextBaseJ
 
   private final ReactApplicationContext reactContext;
 
+  public static LocalBroadcastManager localBroadcastManager;
+
   public RNReactNativeSharedGroupPreferencesModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+    localBroadcastManager = LocalBroadcastManager.getInstance(reactContext);
   }
 
   private SharedPreferences getSharedPreferences(String appGroup) {
@@ -160,6 +169,22 @@ public class RNReactNativeSharedGroupPreferencesModule extends ReactContextBaseJ
       //}
     }
   }
+
+  @ReactMethod
+  public void registerEvents() {
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        // Handle the broadcast intent here
+        String data = intent.getStringExtra("data");
+        getReactApplicationContext()
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onReceive", data);
+      }
+    };
+
+    IntentFilter filter = new IntentFilter("com.poppop.RNReactNativeSharedGroupPreferences.event");
+    localBroadcastManager.registerReceiver(receiver, filter);
 }
 
 /*
