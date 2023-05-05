@@ -185,6 +185,7 @@ public class RNReactNativeSharedGroupPreferencesModule extends ReactContextBaseJ
 
     IntentFilter filter = new IntentFilter("com.poppop.RNReactNativeSharedGroupPreferences.event");
     localBroadcastManager.registerReceiver(receiver, filter);
+  }
 }
 
 /*
