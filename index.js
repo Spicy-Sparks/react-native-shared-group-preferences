@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native'
+import { NativeModules, Platform, NativeEventEmitter } from 'react-native'
 const { RNReactNativeSharedGroupPreferences } = NativeModules
 const emitter = new NativeEventEmitter(RNReactNativeSharedGroupPreferences)
 
